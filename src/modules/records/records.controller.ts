@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
   Request,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -61,7 +62,7 @@ export class RecordsController {
   @ApiOperation({ summary: 'Get a single record by ID' })
   @ApiResponse({ status: 200, description: 'Record found' })
   @ApiResponse({ status: 404, description: 'Record not found' })
-  async findOne(@Request() req: AuthenticatedRequest, @Param('id') id: string) {
+  async findOne(@Request() req: AuthenticatedRequest, @Param('id', ParseUUIDPipe) id: string) {
     return this.recordsService.findOne(id, req.user.id, req.user.role);
   }
 
@@ -71,7 +72,7 @@ export class RecordsController {
   @ApiResponse({ status: 200, description: 'Record updated' })
   @ApiResponse({ status: 404, description: 'Record not found' })
   async update(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateRecordDto: UpdateRecordDto,
     @Request() req: AuthenticatedRequest,
   ) {
@@ -88,7 +89,7 @@ export class RecordsController {
   @ApiOperation({ summary: 'Delete a financial record' })
   @ApiResponse({ status: 200, description: 'Record deleted' })
   @ApiResponse({ status: 404, description: 'Record not found' })
-  async remove(@Param('id') id: string, @Request() req: AuthenticatedRequest) {
+  async remove(@Param('id', ParseUUIDPipe) id: string, @Request() req: AuthenticatedRequest) {
     return this.recordsService.remove(id, req.user.id, req.user.role);
   }
 }

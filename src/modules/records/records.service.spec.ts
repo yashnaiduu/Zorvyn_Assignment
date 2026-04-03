@@ -68,7 +68,7 @@ describe('RecordsService', () => {
       const record = { id: 'r1', userId: 'user-2', amount: 100 };
       mockPrisma.record.findUnique.mockResolvedValue(record);
 
-      await expect(service.findOne('r1', 'user-1', 'ANALYST')).rejects.toThrow(
+      await expect(service.findOne('r1', 'user-1', 'VIEWER')).rejects.toThrow(
         ForbiddenException,
       );
     });
@@ -87,7 +87,7 @@ describe('RecordsService', () => {
       mockPrisma.record.findMany.mockResolvedValue([]);
       mockPrisma.record.count.mockResolvedValue(0);
 
-      await service.findAll({}, 'user-1', 'ANALYST');
+      await service.findAll({}, 'user-1', 'VIEWER');
 
       const whereArg = mockPrisma.record.findMany.mock.calls[0][0].where;
       expect(whereArg.userId).toBe('user-1');

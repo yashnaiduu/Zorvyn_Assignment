@@ -7,13 +7,13 @@ import {
   UseGuards,
   Request,
   Query,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import {
   ApiTags,
   ApiBearerAuth,
   ApiOperation,
   ApiResponse,
-  ApiQuery,
 } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { Permissions } from '../../common/decorators/permissions.decorator';
@@ -21,6 +21,7 @@ import { PermissionsGuard } from '../../common/guards/permissions.guard';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { ToggleActiveDto } from './dto/toggle-active.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
 import type { AuthenticatedRequest } from '../../common/interfaces/request.interface';
 
 @ApiTags('Users')
@@ -33,17 +34,9 @@ export class UsersController {
 
   @Get()
   @ApiOperation({ summary: 'List all users (paginated)' })
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({ status: 200, description: 'Paginated list of users' })
-  async getAllUsers(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ) {
-    return this.usersService.findAll(
-      page ? Number(page) : 1,
-      limit ? Number(limit) : 10,
-    );
+  async getAllUsers(@Query() query: PaginationQueryDto) {
+    return this.usersService.findAll(query.page ?? 1, query.limit ?? 10);
   }
 
   @Patch(':id/role')
@@ -51,7 +44,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Role updated' })
   @ApiResponse({ status: 404, description: 'User not found' })
   async updateRole(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateRoleDto: UpdateRoleDto,
     @Request() req: AuthenticatedRequest,
   ) {
@@ -63,7 +56,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Active status updated' })
   @ApiResponse({ status: 404, description: 'User not found' })
   async toggleActive(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() toggleActiveDto: ToggleActiveDto,
     @Request() req: AuthenticatedRequest,
   ) {
