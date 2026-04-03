@@ -1,29 +1,35 @@
 import { useState } from 'react';
-import { RecordItem } from '../services/records';
+import { RecordItem, RecordType, RecordPayload } from '../services/records';
 
 interface RecordFormProps {
   record?: RecordItem | null;
-  onSubmit: (data: Record<string, unknown>) => Promise<void>;
+  onSubmit: (data: RecordPayload) => Promise<void>;
   onCancel: () => void;
 }
 
 export default function RecordForm({ record, onSubmit, onCancel }: RecordFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [formData, setFormData] = useState({
-    amount: record?.amount || '',
-    type: record?.type || 'EXPENSE',
-    category: record?.category || '',
-    date: record ? new Date(record.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-    description: record?.description || '',
-  });
+  const [type, setType] = useState<RecordType>(record?.type || 'EXPENSE');
+  const [amount, setAmount] = useState(record?.amount?.toString() || '');
+  const [category, setCategory] = useState(record?.category || '');
+  const [date, setDate] = useState(
+    record ? new Date(record.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+  );
+  const [description, setDescription] = useState(record?.description || '');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
     try {
-      await onSubmit({ ...formData, amount: Number(formData.amount), date: new Date(formData.date).toISOString() });
+      await onSubmit({
+        amount: Number(amount),
+        type,
+        category,
+        date: new Date(date).toISOString(),
+        description,
+      });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
       setLoading(false);
@@ -50,26 +56,26 @@ export default function RecordForm({ record, onSubmit, onCancel }: RecordFormPro
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-[13px] font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Type</label>
-            <select value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })} required>
+            <select value={type} onChange={(e) => setType(e.target.value as RecordType)} required>
               <option value="EXPENSE">Expense</option>
               <option value="INCOME">Income</option>
             </select>
           </div>
           <div>
             <label className="block text-[13px] font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Amount</label>
-            <input type="number" step="0.01" min="0" placeholder="0.00" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: e.target.value })} required />
+            <input type="number" step="0.01" min="0" placeholder="0.00" value={amount} onChange={(e) => setAmount(e.target.value)} required />
           </div>
           <div>
             <label className="block text-[13px] font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Category</label>
-            <input type="text" placeholder="e.g. Salary" value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} required />
+            <input type="text" placeholder="e.g. Salary" value={category} onChange={(e) => setCategory(e.target.value)} required />
           </div>
           <div>
             <label className="block text-[13px] font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Date</label>
-            <input type="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} required />
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
           </div>
           <div>
             <label className="block text-[13px] font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Description</label>
-            <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Optional" rows={2} />
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Optional" rows={2} />
           </div>
 
           <div className="flex justify-end gap-3 pt-2">

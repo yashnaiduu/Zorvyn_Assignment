@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import RecordTable from '@/components/record-table';
 import RecordForm from '@/components/record-form';
 import Pagination from '@/components/pagination';
-import { recordsService, RecordItem, PaginationMeta } from '@/services/records';
+import { recordsService, RecordItem, RecordPayload, PaginationMeta } from '@/services/records';
 import { getUser, StoredUser } from '@/utils/token';
 import { hasPermission } from '@/utils/rbac';
 
@@ -30,7 +30,7 @@ export default function RecordsPage() {
 
   useEffect(() => { fetchRecords(1); }, [typeFilter, categoryFilter]);
 
-  const handleSubmit = async (data: Record<string, unknown>) => {
+  const handleSubmit = async (data: RecordPayload) => {
     if (editingRecord) await recordsService.update(editingRecord.id, data);
     else await recordsService.create(data);
     setIsFormOpen(false);
