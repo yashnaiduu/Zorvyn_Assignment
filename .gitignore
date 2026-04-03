@@ -4,3 +4,10 @@ dist
 .env
 
 /generated/prisma
+
+# Unwanted instructional / agent md files
+cleanup.md
+enterprise_audit.md
+prompt.md
+frontend/AGENTS.md
+frontend/CLAUDE.md
