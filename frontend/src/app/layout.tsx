@@ -1,21 +1,20 @@
-import type { Metadata } from 'next'
-import './globals.css'
+import type { Metadata } from 'next';
+import './globals.css';
+import { ThemeProvider } from '@/utils/theme';
 
 export const metadata: Metadata = {
-  title: 'Zorvyn Finance',
-  description: 'Enterprise Finance Dashboard',
-}
+  title: 'Zorvyn — Finance',
+  description: 'Enterprise finance management platform',
+};
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="bg-gray-50 text-gray-900 min-h-screen">
-        {children}
+    <html lang="en" suppressHydrationWarning>
+      <body className="min-h-screen">
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }

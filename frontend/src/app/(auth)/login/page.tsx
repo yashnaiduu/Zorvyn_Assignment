@@ -17,61 +17,57 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     try {
       const res = await authService.login({ email, password });
       setTokens(res.data.access_token, res.data.refresh_token, res.data.user);
       router.push('/dashboard');
-    } catch (err: any) {
-      setError(err.message || 'Login failed');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Login failed');
       setLoading(false);
     }
   };
 
   return (
     <>
-      <div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to Zorvyn</h2>
+      <div className="text-center mb-10">
+        <h1 className="text-[34px] font-semibold tracking-tight leading-tight" style={{ color: 'var(--text)' }}>
+          Sign in
+        </h1>
+        <p className="text-[15px] mt-2" style={{ color: 'var(--text-secondary)' }}>
+          Access your Zorvyn account
+        </p>
       </div>
-      <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-        {error && <div className="text-red-500 text-sm text-center bg-red-50 py-2 rounded">{error}</div>}
-        <div className="space-y-4 rounded-md shadow-sm">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email address</label>
-            <input
-              type="email"
-              required
-              className="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
-            <input
-              type="password"
-              required
-              className="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+
+      <form onSubmit={handleLogin} className="space-y-5">
+        {error && (
+          <p className="text-[13px] text-center py-3 rounded-xl" style={{ color: 'var(--danger)', background: 'var(--bg-secondary)' }}>
+            {error}
+          </p>
+        )}
+
+        <div>
+          <label className="block text-[13px] font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Email</label>
+          <input type="email" required placeholder="name@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
 
         <div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-          >
-            {loading ? 'Signing in...' : 'Sign in'}
-          </button>
+          <label className="block text-[13px] font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Password</label>
+          <input type="password" required placeholder="Enter password" value={password} onChange={(e) => setPassword(e.target.value)} />
         </div>
-        <div className="text-center text-sm">
-          <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
-            Don't have an account? Register
-          </Link>
-        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-3 rounded-xl text-[15px] font-medium text-white transition-opacity disabled:opacity-50"
+          style={{ background: 'var(--accent)' }}
+        >
+          {loading ? 'Signing in…' : 'Sign in'}
+        </button>
+
+        <p className="text-center text-[13px]" style={{ color: 'var(--text-secondary)' }}>
+          New to Zorvyn?{' '}
+          <Link href="/register" style={{ color: 'var(--accent)' }}>Create account</Link>
+        </p>
       </form>
     </>
   );

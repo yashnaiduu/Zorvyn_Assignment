@@ -1,32 +1,64 @@
-export default function BarChart({ data }: { data: { label: string; value: number; color?: string }[] }) {
-  if (!data || data.length === 0) return <div className="text-gray-500 text-sm text-center py-10">No data available</div>;
+'use client';
 
-  const maxVal = Math.max(...data.map(d => d.value));
-  const height = 250;
-  
+import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+
+export default function BarChart({ data }: { data: { label: string; value: number; color?: string }[] }) {
+  if (!data || data.length === 0) {
+    return <div className="flex items-center justify-center h-full"><p className="text-[14px]" style={{ color: 'var(--text-tertiary)' }}>No data</p></div>;
+  }
+
+  const topData = data.slice(0, 7);
+
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="px-4 py-3 rounded-[14px] shadow-sm border backdrop-blur-md" style={{ background: 'var(--bg)', borderColor: 'var(--border-subtle)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
+          <p className="text-[12px] font-medium" style={{ color: 'var(--text-secondary)' }}>{payload[0].payload.label}</p>
+          <p className="text-[15px] font-semibold mt-0.5" style={{ color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>
+            ${payload[0].value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
-    <div className="w-full flex items-end h-[250px] gap-2 pt-4">
-      {data.map((item, i) => {
-        const barHeight = maxVal > 0 ? (item.value / maxVal) * (height - 30) : 0;
-        return (
-          <div key={i} className="flex flex-col items-center flex-1 group relative">
-            <div 
-              className="w-full rounded-t-sm transition-all duration-300 hover:opacity-80"
-              style={{ 
-                height: `${Math.max(barHeight, 4)}px`, 
-                backgroundColor: item.color || '#3b82f6' 
-              }}
-            >
-              <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs py-1 px-2 rounded pointer-events-none whitespace-nowrap transition-opacity">
-                ${item.value.toFixed(2)}
-              </div>
-            </div>
-            <div className="w-full text-center text-xs text-gray-500 mt-2 truncate px-1" title={item.label}>
-              {item.label}
-            </div>
-          </div>
-        );
-      })}
-    </div>
+    <ResponsiveContainer width="100%" height="100%">
+      <RechartsBarChart data={topData} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
+        <XAxis 
+          dataKey="label" 
+          axisLine={false} 
+          tickLine={false} 
+          tick={{ fill: 'var(--text-tertiary)', fontSize: 11, fontFamily: 'system-ui' }} 
+          tickMargin={15}
+          interval={0}
+        />
+        <YAxis 
+          axisLine={false} 
+          tickLine={false} 
+          tick={{ fill: 'var(--text-tertiary)', fontSize: 11, fontFamily: 'system-ui' }}
+          tickFormatter={(val) => `$${val}`}
+          width={60}
+        />
+        <Tooltip 
+          content={<CustomTooltip />} 
+          cursor={{ fill: 'var(--border-subtle)', opacity: 0.15, radius: 6 }} 
+          animationDuration={300}
+          animationEasing="ease-out"
+        />
+        <Bar 
+          dataKey="value" 
+          radius={[6, 6, 6, 6]} 
+          barSize={28}
+          animationDuration={1200}
+          animationEasing="ease"
+        >
+          {topData.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={entry.color || 'var(--accent)'} />
+          ))}
+        </Bar>
+      </RechartsBarChart>
+    </ResponsiveContainer>
   );
 }

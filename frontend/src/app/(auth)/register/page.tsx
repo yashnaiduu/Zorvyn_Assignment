@@ -18,72 +18,60 @@ export default function RegisterPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     try {
       const res = await authService.register({ name, email, password });
       setTokens(res.data.access_token, res.data.refresh_token, res.data.user);
       router.push('/dashboard');
-    } catch (err: any) {
-      setError(err.message || 'Registration failed');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Registration failed');
       setLoading(false);
     }
   };
 
   return (
     <>
-      <div>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Register for Zorvyn</h2>
+      <div className="text-center mb-10">
+        <h1 className="text-[34px] font-semibold tracking-tight leading-tight" style={{ color: 'var(--text)' }}>
+          Create account
+        </h1>
+        <p className="text-[15px] mt-2" style={{ color: 'var(--text-secondary)' }}>
+          Get started with Zorvyn
+        </p>
       </div>
-      <form className="mt-8 space-y-6" onSubmit={handleRegister}>
-        {error && <div className="text-red-500 text-sm text-center bg-red-50 py-2 rounded">{error}</div>}
-        <div className="space-y-4 rounded-md shadow-sm">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Full Name</label>
-            <input
-              type="text"
-              required
-              className="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email address</label>
-            <input
-              type="email"
-              required
-              className="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
-            <input
-              type="password"
-              required
-              minLength={6}
-              className="mt-1 block w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-        </div>
+
+      <form onSubmit={handleRegister} className="space-y-5">
+        {error && (
+          <p className="text-[13px] text-center py-3 rounded-xl" style={{ color: 'var(--danger)', background: 'var(--bg-secondary)' }}>
+            {error}
+          </p>
+        )}
 
         <div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-          >
-            {loading ? 'Registering...' : 'Register'}
-          </button>
+          <label className="block text-[13px] font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Name</label>
+          <input type="text" required placeholder="Full name" value={name} onChange={(e) => setName(e.target.value)} />
         </div>
-        <div className="text-center text-sm">
-          <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
-            Already have an account? Sign in
-          </Link>
+        <div>
+          <label className="block text-[13px] font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Email</label>
+          <input type="email" required placeholder="name@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
+        <div>
+          <label className="block text-[13px] font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Password</label>
+          <input type="password" required minLength={6} placeholder="Min. 6 characters" value={password} onChange={(e) => setPassword(e.target.value)} />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-3 rounded-xl text-[15px] font-medium text-white transition-opacity disabled:opacity-50"
+          style={{ background: 'var(--accent)' }}
+        >
+          {loading ? 'Creating…' : 'Create account'}
+        </button>
+
+        <p className="text-center text-[13px]" style={{ color: 'var(--text-secondary)' }}>
+          Already have an account?{' '}
+          <Link href="/login" style={{ color: 'var(--accent)' }}>Sign in</Link>
+        </p>
       </form>
     </>
   );

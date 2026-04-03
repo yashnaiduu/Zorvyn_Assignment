@@ -48,7 +48,7 @@ export class RecordsService {
     const where: Prisma.RecordWhereInput = {};
 
     // Restrict own records only
-    if (callerRole !== 'ADMIN') {
+    if (callerRole !== 'ADMIN' && callerRole !== 'ANALYST') {
       where.userId = callerId;
     }
 
@@ -142,7 +142,7 @@ export class RecordsService {
     callerId: string,
     callerRole: string,
   ) {
-    if (callerRole !== 'ADMIN' && recordUserId !== callerId) {
+    if (callerRole !== 'ADMIN' && callerRole !== 'ANALYST' && recordUserId !== callerId) {
       throw new ForbiddenException('You do not have access to this record');
     }
   }

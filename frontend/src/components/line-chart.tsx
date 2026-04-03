@@ -1,92 +1,99 @@
-export default function LineChart({ data }: { data: { label: string; values: { name: string, value: number, color: string }[] }[] }) {
-  if (!data || data.length === 0) return <div className="text-gray-500 text-sm text-center py-10">No data available</div>;
+'use client';
 
-  const width = 600;
-  const height = 250;
-  const padding = 40;
+import { LineChart as RechartsLineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
-  // Find max value across all series
-  let maxVal = 0;
-  data.forEach(d => {
+export default function LineChart({ data }: { data: { label: string; values: { name: string; value: number; color: string }[] }[] }) {
+  if (!data || data.length === 0) {
+    return <div className="flex items-center justify-center h-full"><p className="text-[14px]" style={{ color: 'var(--text-tertiary)' }}>No data</p></div>;
+  }
+
+  const formattedData = data.map(d => {
+    let shortLabel = d.label;
+    if (/^\d{4}-\d{2}$/.test(d.label)) {
+      const date = new Date(`${d.label}-01T00:00:00`);
+      shortLabel = date.toLocaleDateString('en-US', { month: 'short' });
+    }
+    
+    const obj: any = { name: shortLabel };
     d.values.forEach(v => {
-      if (v.value > maxVal) maxVal = v.value;
+      obj[v.name] = v.value;
     });
+    return obj;
   });
 
-  // Calculate coordinates
-  const points: Record<string, string> = {};
-  const colors: Record<string, string> = {};
-  
-  // Initialize series
+  const lines: Record<string, string> = {};
   if (data.length > 0) {
     data[0].values.forEach(v => {
-      points[v.name] = '';
-      colors[v.name] = v.color;
+      lines[v.name] = v.color;
     });
   }
 
-  const xStep = (width - padding * 2) / Math.max(data.length - 1, 1);
-
-  data.forEach((d, i) => {
-    const x = padding + i * xStep;
-    d.values.forEach(v => {
-      const y = height - padding - (maxVal > 0 ? (v.value / maxVal) * (height - padding * 2) : 0);
-      points[v.name] += `${i === 0 ? 'M' : 'L'} ${x} ${y} `;
-    });
-  });
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="px-5 py-4 rounded-[16px] shadow-sm border backdrop-blur-md min-w-[140px]" style={{ background: 'var(--bg)', borderColor: 'var(--border-subtle)', boxShadow: '0 8px 30px rgba(0,0,0,0.1)' }}>
+          <p className="text-[13px] font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>{label} 2024</p>
+          <div className="space-y-2">
+            {payload.map((entry: any, index: number) => (
+              <div key={index} className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ background: entry.color }} />
+                  <span className="text-[13px]" style={{ color: 'var(--text-tertiary)' }}>{entry.name}</span>
+                </div>
+                <span className="text-[14px] font-semibold" style={{ color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>
+                  ${entry.value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
-    <div className="w-full overflow-hidden flex flex-col justify-center">
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto">
-        {/* Grid lines */}
-        {[0, 0.25, 0.5, 0.75, 1].map((ratio, i) => {
-          const y = padding + ratio * (height - padding * 2);
-          return (
-            <g key={`grid-${i}`}>
-              <line x1={padding} y1={y} x2={width - padding} y2={y} stroke="#f3f4f6" strokeWidth="1" />
-              <text x={padding - 5} y={y + 4} fontSize="10" fill="#9ca3af" textAnchor="end">
-                ${(maxVal * (1 - ratio)).toFixed(0)}
-              </text>
-            </g>
-          );
-        })}
-        
-        {/* Lines */}
-        {Object.entries(points).map(([name, pathD]) => (
-          <path key={name} d={pathD} fill="none" stroke={colors[name] || '#000'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-        ))}
-        
-        {/* Data points */}
-        {data.map((d, i) => {
-          const x = padding + i * xStep;
-          return d.values.map(v => {
-            const y = height - padding - (maxVal > 0 ? (v.value / maxVal) * (height - padding * 2) : 0);
-            return (
-              <circle key={`${i}-${v.name}`} cx={x} cy={y} r="4" fill={colors[v.name] || '#000'} stroke="#fff" strokeWidth="2" />
-            );
-          });
-        })}
+    <ResponsiveContainer width="100%" height="100%">
+      <RechartsLineChart data={formattedData} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
+        <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="var(--border-subtle)" />
+        <XAxis 
+          dataKey="name" 
+          axisLine={false} 
+          tickLine={false} 
+          tick={{ fill: 'var(--text-tertiary)', fontSize: 10, fontFamily: 'system-ui' }} 
+          tickMargin={15}
+          interval={0}
+        />
+        <YAxis 
+          axisLine={false} 
+          tickLine={false} 
+          tick={{ fill: 'var(--text-tertiary)', fontSize: 11, fontFamily: 'system-ui' }}
+          tickFormatter={(val) => `$${val}`}
+          width={60}
+        />
+        <Tooltip 
+          content={<CustomTooltip />} 
+          cursor={{ stroke: 'var(--border-subtle)', strokeWidth: 1, strokeDasharray: '4 4' }} 
+          animationDuration={300}
+          animationEasing="ease-out"
+        />
+        <Legend iconType="circle" iconSize={7} wrapperStyle={{ fontSize: 12, color: 'var(--text-secondary)', bottom: -5, fontFamily: 'system-ui' }} />
 
-        {/* X Axis Labels */}
-        {data.map((d, i) => {
-          const x = padding + i * xStep;
-          return (
-            <text key={`label-${i}`} x={x} y={height - 10} fontSize="12" fill="#6b7280" textAnchor="middle">
-              {d.label}
-            </text>
-          );
-        })}
-      </svg>
-      
-      {/* Legend */}
-      <div className="flex justify-center gap-4 mt-2">
-        {Object.keys(colors).map(name => (
-          <div key={name} className="flex items-center gap-1 text-sm text-gray-600">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: colors[name] }}></div>
-            {name}
-          </div>
+        
+        {Object.entries(lines).map(([name, color]) => (
+          <Line 
+            key={name}
+            type="monotone" 
+            dataKey={name} 
+            stroke={color} 
+            strokeWidth={3}
+            dot={false}
+            activeDot={{ r: 5, strokeWidth: 3, stroke: 'var(--bg)', fill: color }}
+            animationDuration={1500}
+            animationEasing="ease"
+          />
         ))}
-      </div>
-    </div>
+      </RechartsLineChart>
+    </ResponsiveContainer>
   );
 }
