@@ -20,7 +20,9 @@ const mockPrisma = {
     findMany: jest.fn(),
     count: jest.fn(),
   },
-  $transaction: jest.fn((fn: (tx: typeof txMock) => Promise<unknown>) => fn(txMock)),
+  $transaction: jest.fn((fn: (tx: typeof txMock) => Promise<unknown>) =>
+    fn(txMock),
+  ),
 };
 
 describe('UsersService', () => {
@@ -64,7 +66,13 @@ describe('UsersService', () => {
 
   describe('findById', () => {
     it('should return user by id', async () => {
-      const user = { id: '1', email: 'a@b.com', name: 'Test', role: 'VIEWER', isActive: true };
+      const user = {
+        id: '1',
+        email: 'a@b.com',
+        name: 'Test',
+        role: 'VIEWER',
+        isActive: true,
+      };
       mockPrisma.user.findUnique.mockResolvedValue(user);
 
       const result = await service.findById('1');
@@ -74,7 +82,9 @@ describe('UsersService', () => {
     it('should throw NotFoundException when user not found', async () => {
       mockPrisma.user.findUnique.mockResolvedValue(null);
 
-      await expect(service.findById('missing')).rejects.toThrow(NotFoundException);
+      await expect(service.findById('missing')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -107,14 +117,20 @@ describe('UsersService', () => {
       txMock.user.update.mockResolvedValue({ id: '1', role: 'ADMIN' });
       mockAuditService.logAction.mockResolvedValue({});
 
-      const result = await service.updateRole('1', 'ADMIN' as any, 'actor-1');
+      await service.updateRole('1', 'ADMIN' as any, 'actor-1');
 
-      expect(txMock.user.update).toHaveBeenCalledWith(expect.objectContaining({
-        where: { id: '1' },
-        data: { role: 'ADMIN' },
-      }));
+      expect(txMock.user.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: '1' },
+          data: { role: 'ADMIN' },
+        }),
+      );
       expect(mockAuditService.logAction).toHaveBeenCalledWith(
-        txMock, 'actor-1', 'UPDATE_ROLE', 'User', '1',
+        txMock,
+        'actor-1',
+        'UPDATE_ROLE',
+        'User',
+        '1',
       );
     });
 
@@ -135,12 +151,18 @@ describe('UsersService', () => {
 
       await service.toggleActive('1', false, 'actor-1');
 
-      expect(txMock.user.update).toHaveBeenCalledWith(expect.objectContaining({
-        where: { id: '1' },
-        data: { isActive: false },
-      }));
+      expect(txMock.user.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: '1' },
+          data: { isActive: false },
+        }),
+      );
       expect(mockAuditService.logAction).toHaveBeenCalledWith(
-        txMock, 'actor-1', 'TOGGLE_ACTIVE', 'User', '1',
+        txMock,
+        'actor-1',
+        'TOGGLE_ACTIVE',
+        'User',
+        '1',
       );
     });
   });

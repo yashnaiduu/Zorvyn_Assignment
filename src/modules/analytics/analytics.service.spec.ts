@@ -64,7 +64,11 @@ describe('AnalyticsService', () => {
       const result = await service.getCategoryBreakdown();
 
       expect(result).toHaveLength(2);
-      expect(result[0]).toEqual({ category: 'Salary', type: 'INCOME', total: 5000 });
+      expect(result[0]).toEqual({
+        category: 'Salary',
+        type: 'INCOME',
+        total: 5000,
+      });
     });
 
     it('should handle null amount sums', async () => {

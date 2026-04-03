@@ -16,10 +16,12 @@ import { HealthModule } from './modules/health/health.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 30,
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 30,
+      },
+    ]),
     PrismaModule,
     AuthModule,
     UsersModule,

@@ -1,4 +1,13 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsString, IsDateString, IsOptional, Min, MaxLength } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  IsDateString,
+  IsOptional,
+  Min,
+  MaxLength,
+} from 'class-validator';
 import { RecordType } from '@prisma/client';
 import { Type } from 'class-transformer';
 

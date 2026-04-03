@@ -33,7 +33,13 @@ describe('AuditService', () => {
         auditLog: { create: jest.fn().mockResolvedValue({ id: 'log-1' }) },
       };
 
-      await service.logAction(txClient as any, 'user-1', 'CREATE', 'Record', 'entity-1');
+      await service.logAction(
+        txClient as any,
+        'user-1',
+        'CREATE',
+        'Record',
+        'entity-1',
+      );
 
       expect(txClient.auditLog.create).toHaveBeenCalledWith({
         data: {

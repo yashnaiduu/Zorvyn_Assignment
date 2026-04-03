@@ -5,7 +5,14 @@ import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
 
 // Map Roles to allowed Permissions
 const RolePermissions: Record<Role, string[]> = {
-  ADMIN: ['record:create', 'record:read', 'record:update', 'record:delete', 'user:manage', 'analytics:read'],
+  ADMIN: [
+    'record:create',
+    'record:read',
+    'record:update',
+    'record:delete',
+    'user:manage',
+    'analytics:read',
+  ],
   ANALYST: ['record:read', 'analytics:read'],
   VIEWER: ['analytics:read'],
 };
@@ -15,11 +22,11 @@ export class PermissionsGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(PERMISSIONS_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-    
+    const requiredPermissions = this.reflector.getAllAndOverride<string[]>(
+      PERMISSIONS_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+
     if (!requiredPermissions) {
       return true;
     }
@@ -28,6 +35,8 @@ export class PermissionsGuard implements CanActivate {
     if (!user || !user.role) return false;
 
     const userPermissions = RolePermissions[user.role as Role] || [];
-    return requiredPermissions.some((permission) => userPermissions.includes(permission));
+    return requiredPermissions.some((permission) =>
+      userPermissions.includes(permission),
+    );
   }
 }

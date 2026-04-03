@@ -1,7 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, Request } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { RecordsService } from './records.service';
-import { CreateRecordDto, UpdateRecordDto, FilterRecordDto } from './dto/record.dto';
+import {
+  CreateRecordDto,
+  UpdateRecordDto,
+  FilterRecordDto,
+} from './dto/record.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../common/guards/permissions.guard';
 import { Permissions } from '../../common/decorators/permissions.decorator';
@@ -18,7 +38,10 @@ export class RecordsController {
   @Permissions('record:create')
   @ApiOperation({ summary: 'Create a financial record' })
   @ApiResponse({ status: 201, description: 'Record created' })
-  async create(@Request() req: AuthenticatedRequest, @Body() createRecordDto: CreateRecordDto) {
+  async create(
+    @Request() req: AuthenticatedRequest,
+    @Body() createRecordDto: CreateRecordDto,
+  ) {
     return this.recordsService.create(req.user.id, createRecordDto);
   }
 
@@ -26,7 +49,10 @@ export class RecordsController {
   @Permissions('record:read')
   @ApiOperation({ summary: 'List records with filtering and pagination' })
   @ApiResponse({ status: 200, description: 'Paginated list of records' })
-  async findAll(@Request() req: AuthenticatedRequest, @Query() filterDto: FilterRecordDto) {
+  async findAll(
+    @Request() req: AuthenticatedRequest,
+    @Query() filterDto: FilterRecordDto,
+  ) {
     return this.recordsService.findAll(filterDto, req.user.id, req.user.role);
   }
 
@@ -49,7 +75,12 @@ export class RecordsController {
     @Body() updateRecordDto: UpdateRecordDto,
     @Request() req: AuthenticatedRequest,
   ) {
-    return this.recordsService.update(id, updateRecordDto, req.user.id, req.user.role);
+    return this.recordsService.update(
+      id,
+      updateRecordDto,
+      req.user.id,
+      req.user.role,
+    );
   }
 
   @Delete(':id')

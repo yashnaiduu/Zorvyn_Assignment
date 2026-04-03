@@ -12,8 +12,7 @@ export class HealthController {
   @Get()
   @ApiOperation({ summary: 'Health check' })
   async check() {
-    const dbUp = await this.prisma
-      .$queryRaw`SELECT 1`
+    const dbUp = await this.prisma.$queryRaw`SELECT 1`
       .then(() => true)
       .catch(() => false);
 

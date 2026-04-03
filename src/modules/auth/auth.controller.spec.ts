@@ -65,7 +65,10 @@ describe('AuthController', () => {
       const result = await controller.refresh({ refreshToken: 'old-rt' });
 
       expect(result.access_token).toBe('new-at');
-      expect(mockAuthService.refreshTokens).toHaveBeenCalledWith('user-1', 'old-rt');
+      expect(mockAuthService.refreshTokens).toHaveBeenCalledWith(
+        'user-1',
+        'old-rt',
+      );
     });
 
     it('should throw UnauthorizedException on invalid token', async () => {
@@ -80,7 +83,9 @@ describe('AuthController', () => {
   describe('logout', () => {
     it('should delegate to AuthService.logout and return message', async () => {
       mockAuthService.logout.mockResolvedValue(undefined);
-      const req = { user: { id: 'user-1', email: 'a@b.com', role: 'ADMIN' } } as any;
+      const req = {
+        user: { id: 'user-1', email: 'a@b.com', role: 'ADMIN' },
+      } as any;
 
       const result = await controller.logout(req);
 

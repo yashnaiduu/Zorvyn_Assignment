@@ -1,6 +1,14 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { CreateRecordDto, UpdateRecordDto, FilterRecordDto } from './dto/record.dto';
+import {
+  CreateRecordDto,
+  UpdateRecordDto,
+  FilterRecordDto,
+} from './dto/record.dto';
 import { Prisma } from '@prisma/client';
 import { AuditService } from '../audit/audit.service';
 
@@ -21,15 +29,25 @@ export class RecordsService {
         },
       });
 
-      await this.auditService.logAction(tx, userId, 'CREATE', 'Record', record.id);
+      await this.auditService.logAction(
+        tx,
+        userId,
+        'CREATE',
+        'Record',
+        record.id,
+      );
       return record;
     });
   }
 
-  async findAll(filterDto: FilterRecordDto, callerId: string, callerRole: string) {
+  async findAll(
+    filterDto: FilterRecordDto,
+    callerId: string,
+    callerRole: string,
+  ) {
     const where: Prisma.RecordWhereInput = {};
 
-    // Non-admin users only see their own records
+    // Restrict own records only
     if (callerRole !== 'ADMIN') {
       where.userId = callerId;
     }
@@ -74,17 +92,30 @@ export class RecordsService {
     return record;
   }
 
-  async update(id: string, updateRecordDto: UpdateRecordDto, callerId: string, callerRole: string) {
+  async update(
+    id: string,
+    updateRecordDto: UpdateRecordDto,
+    callerId: string,
+    callerRole: string,
+  ) {
     const existing = await this.prisma.record.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Record not found');
     this.assertOwnership(existing.userId, callerId, callerRole);
 
     const data: Prisma.RecordUpdateInput = {
-      ...(updateRecordDto.amount !== undefined && { amount: updateRecordDto.amount }),
+      ...(updateRecordDto.amount !== undefined && {
+        amount: updateRecordDto.amount,
+      }),
       ...(updateRecordDto.type !== undefined && { type: updateRecordDto.type }),
-      ...(updateRecordDto.category !== undefined && { category: updateRecordDto.category }),
-      ...(updateRecordDto.description !== undefined && { description: updateRecordDto.description }),
-      ...(updateRecordDto.date !== undefined && { date: new Date(updateRecordDto.date) }),
+      ...(updateRecordDto.category !== undefined && {
+        category: updateRecordDto.category,
+      }),
+      ...(updateRecordDto.description !== undefined && {
+        description: updateRecordDto.description,
+      }),
+      ...(updateRecordDto.date !== undefined && {
+        date: new Date(updateRecordDto.date),
+      }),
     };
 
     return this.prisma.$transaction(async (tx) => {
@@ -106,7 +137,11 @@ export class RecordsService {
     });
   }
 
-  private assertOwnership(recordUserId: string, callerId: string, callerRole: string) {
+  private assertOwnership(
+    recordUserId: string,
+    callerId: string,
+    callerRole: string,
+  ) {
     if (callerRole !== 'ADMIN' && recordUserId !== callerId) {
       throw new ForbiddenException('You do not have access to this record');
     }

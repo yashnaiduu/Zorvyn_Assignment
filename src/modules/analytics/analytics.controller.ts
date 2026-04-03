@@ -1,5 +1,11 @@
 import { Controller, Get, UseGuards, Query } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { AnalyticsService } from './analytics.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../common/guards/permissions.guard';
@@ -28,7 +34,9 @@ export class AnalyticsController {
   }
 
   @Get('trends')
-  @ApiOperation({ summary: 'Get monthly income/expense trends (DB-level aggregation)' })
+  @ApiOperation({
+    summary: 'Get monthly income/expense trends (DB-level aggregation)',
+  })
   @ApiResponse({ status: 200, description: 'Monthly trends' })
   async getMonthlyTrends() {
     return this.analyticsService.getMonthlyTrends();
@@ -36,9 +44,16 @@ export class AnalyticsController {
 
   @Get('recent')
   @ApiOperation({ summary: 'Get most recent transactions' })
-  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of recent transactions (default 5)' })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Number of recent transactions (default 5)',
+  })
   @ApiResponse({ status: 200, description: 'Recent transactions' })
   async getRecentTransactions(@Query('limit') limit?: string) {
-    return this.analyticsService.getRecentTransactions(limit ? Number(limit) : 5);
+    return this.analyticsService.getRecentTransactions(
+      limit ? Number(limit) : 5,
+    );
   }
 }

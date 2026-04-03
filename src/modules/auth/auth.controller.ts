@@ -1,5 +1,19 @@
-import { Controller, Post, Body, UseGuards, Request, HttpCode, HttpStatus, UnauthorizedException } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+  HttpCode,
+  HttpStatus,
+  UnauthorizedException,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto, RefreshTokenDto } from './dto/auth.dto';
@@ -15,7 +29,10 @@ export class AuthController {
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   @ApiOperation({ summary: 'Register a new user account' })
   @ApiResponse({ status: 201, description: 'User registered successfully' })
-  @ApiResponse({ status: 400, description: 'Validation error or email already taken' })
+  @ApiResponse({
+    status: 400,
+    description: 'Validation error or email already taken',
+  })
   @ApiResponse({ status: 429, description: 'Rate limit exceeded' })
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
@@ -26,7 +43,10 @@ export class AuthController {
   @SkipThrottle()
   @ApiOperation({ summary: 'Authenticate and receive access + refresh tokens' })
   @ApiResponse({ status: 200, description: 'Login successful' })
-  @ApiResponse({ status: 401, description: 'Invalid credentials or inactive account' })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid credentials or inactive account',
+  })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
@@ -41,7 +61,10 @@ export class AuthController {
     if (!decoded?.sub) {
       throw new UnauthorizedException('Invalid token');
     }
-    return this.authService.refreshTokens(decoded.sub as string, refreshDto.refreshToken);
+    return this.authService.refreshTokens(
+      decoded.sub as string,
+      refreshDto.refreshToken,
+    );
   }
 
   @Post('logout')

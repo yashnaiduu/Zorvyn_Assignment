@@ -1,5 +1,20 @@
-import { Controller, Get, Patch, Param, Body, UseGuards, Request, Query } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Patch,
+  Param,
+  Body,
+  UseGuards,
+  Request,
+  Query,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { Permissions } from '../../common/decorators/permissions.decorator';
 import { PermissionsGuard } from '../../common/guards/permissions.guard';
@@ -21,12 +36,18 @@ export class UsersController {
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiResponse({ status: 200, description: 'Paginated list of users' })
-  async getAllUsers(@Query('page') page?: string, @Query('limit') limit?: string) {
-    return this.usersService.findAll(page ? Number(page) : 1, limit ? Number(limit) : 10);
+  async getAllUsers(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.usersService.findAll(
+      page ? Number(page) : 1,
+      limit ? Number(limit) : 10,
+    );
   }
 
   @Patch(':id/role')
-  @ApiOperation({ summary: 'Update a user\'s role' })
+  @ApiOperation({ summary: "Update a user's role" })
   @ApiResponse({ status: 200, description: 'Role updated' })
   @ApiResponse({ status: 404, description: 'User not found' })
   async updateRole(
@@ -46,6 +67,10 @@ export class UsersController {
     @Body() toggleActiveDto: ToggleActiveDto,
     @Request() req: AuthenticatedRequest,
   ) {
-    return this.usersService.toggleActive(id, toggleActiveDto.isActive, req.user.id);
+    return this.usersService.toggleActive(
+      id,
+      toggleActiveDto.isActive,
+      req.user.id,
+    );
   }
 }

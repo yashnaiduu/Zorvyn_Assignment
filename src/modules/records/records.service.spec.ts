@@ -22,7 +22,9 @@ const mockPrisma = {
     findMany: jest.fn(),
     count: jest.fn(),
   },
-  $transaction: jest.fn((fn: (tx: typeof txMock) => Promise<unknown>) => fn(txMock)),
+  $transaction: jest.fn((fn: (tx: typeof txMock) => Promise<unknown>) =>
+    fn(txMock),
+  ),
 };
 
 describe('RecordsService', () => {
@@ -66,9 +68,9 @@ describe('RecordsService', () => {
       const record = { id: 'r1', userId: 'user-2', amount: 100 };
       mockPrisma.record.findUnique.mockResolvedValue(record);
 
-      await expect(
-        service.findOne('r1', 'user-1', 'ANALYST'),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.findOne('r1', 'user-1', 'ANALYST')).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
     it('should allow admin to access any record', async () => {
@@ -105,7 +107,11 @@ describe('RecordsService', () => {
       mockPrisma.record.findMany.mockResolvedValue([{ id: 'r1' }]);
       mockPrisma.record.count.mockResolvedValue(1);
 
-      const result = await service.findAll({ page: 1, limit: 10 }, 'a', 'ADMIN');
+      const result = await service.findAll(
+        { page: 1, limit: 10 },
+        'a',
+        'ADMIN',
+      );
       expect(result.data).toHaveLength(1);
       expect(result.meta).toEqual({ page: 1, limit: 10, total: 1 });
     });
@@ -127,7 +133,11 @@ describe('RecordsService', () => {
 
       expect(txMock.record.create).toHaveBeenCalled();
       expect(mockAuditService.logAction).toHaveBeenCalledWith(
-        txMock, 'user-1', 'CREATE', 'Record', 'r1',
+        txMock,
+        'user-1',
+        'CREATE',
+        'Record',
+        'r1',
       );
       expect(result.id).toBe('r1');
     });
@@ -143,15 +153,24 @@ describe('RecordsService', () => {
     });
 
     it('should delete and audit within transaction', async () => {
-      mockPrisma.record.findUnique.mockResolvedValue({ id: 'r1', userId: 'user-1' });
+      mockPrisma.record.findUnique.mockResolvedValue({
+        id: 'r1',
+        userId: 'user-1',
+      });
       txMock.record.delete.mockResolvedValue({ id: 'r1' });
       mockAuditService.logAction.mockResolvedValue({});
 
       await service.remove('r1', 'user-1', 'ADMIN');
 
-      expect(txMock.record.delete).toHaveBeenCalledWith({ where: { id: 'r1' } });
+      expect(txMock.record.delete).toHaveBeenCalledWith({
+        where: { id: 'r1' },
+      });
       expect(mockAuditService.logAction).toHaveBeenCalledWith(
-        txMock, 'user-1', 'DELETE', 'Record', 'r1',
+        txMock,
+        'user-1',
+        'DELETE',
+        'Record',
+        'r1',
       );
     });
   });

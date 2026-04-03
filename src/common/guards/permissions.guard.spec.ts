@@ -23,17 +23,23 @@ describe('PermissionsGuard', () => {
   });
 
   it('should return false if no user', () => {
-    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['record:create']);
+    jest
+      .spyOn(reflector, 'getAllAndOverride')
+      .mockReturnValue(['record:create']);
     expect(guard.canActivate(mockCtx())).toBe(false);
   });
 
   it('should return true if user has required permissions', () => {
-    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['record:delete']);
+    jest
+      .spyOn(reflector, 'getAllAndOverride')
+      .mockReturnValue(['record:delete']);
     expect(guard.canActivate(mockCtx({ role: 'ADMIN' }))).toBe(true);
   });
 
   it('should return false if user role lacks required permissions', () => {
-    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(['record:delete']);
+    jest
+      .spyOn(reflector, 'getAllAndOverride')
+      .mockReturnValue(['record:delete']);
     expect(guard.canActivate(mockCtx({ role: 'VIEWER' }))).toBe(false);
   });
 });

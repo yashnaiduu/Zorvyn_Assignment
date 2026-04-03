@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  BadRequestException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Role } from '@prisma/client';
@@ -22,7 +26,10 @@ export class AuthService {
       throw new BadRequestException('User with this email already exists');
     }
 
-    const hashedPassword = await bcrypt.hash(registerDto.password, BCRYPT_ROUNDS);
+    const hashedPassword = await bcrypt.hash(
+      registerDto.password,
+      BCRYPT_ROUNDS,
+    );
     const user = await this.prisma.user.create({
       data: {
         email: registerDto.email,
@@ -37,17 +44,29 @@ export class AuthService {
     return {
       access_token: tokens.access_token,
       refresh_token: tokens.refresh_token,
-      user: { id: user.id, email: user.email, name: user.name, role: user.role },
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
     };
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.prisma.user.findUnique({ where: { email: loginDto.email } });
+    const user = await this.prisma.user.findUnique({
+      where: { email: loginDto.email },
+    });
     if (!user || !user.isActive) {
-      throw new UnauthorizedException('Invalid credentials or inactive account');
+      throw new UnauthorizedException(
+        'Invalid credentials or inactive account',
+      );
     }
 
-    const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
+    const isPasswordValid = await bcrypt.compare(
+      loginDto.password,
+      user.password,
+    );
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -58,7 +77,12 @@ export class AuthService {
     return {
       access_token: tokens.access_token,
       refresh_token: tokens.refresh_token,
-      user: { id: user.id, email: user.email, name: user.name, role: user.role },
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
     };
   }
 
@@ -68,7 +92,10 @@ export class AuthService {
       throw new UnauthorizedException('Access Denied');
     }
 
-    const refreshTokenMatches = await bcrypt.compare(refreshToken, user.refreshToken);
+    const refreshTokenMatches = await bcrypt.compare(
+      refreshToken,
+      user.refreshToken,
+    );
     if (!refreshTokenMatches) {
       throw new UnauthorizedException('Access Denied');
     }
@@ -88,7 +115,7 @@ export class AuthService {
 
   decodeToken(token: string): Record<string, unknown> | null {
     try {
-      return this.jwtService.decode(token) as Record<string, unknown> | null;
+      return this.jwtService.decode(token);
     } catch {
       return null;
     }

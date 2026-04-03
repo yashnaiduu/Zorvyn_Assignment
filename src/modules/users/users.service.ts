@@ -17,7 +17,14 @@ export class UsersService {
   async findById(id: string) {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      select: { id: true, email: true, name: true, role: true, isActive: true, createdAt: true },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+      },
     });
     if (!user) throw new NotFoundException('User not found');
     return user;
@@ -29,7 +36,14 @@ export class UsersService {
       this.prisma.user.findMany({
         skip,
         take: limit,
-        select: { id: true, email: true, name: true, role: true, isActive: true, createdAt: true },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          isActive: true,
+          createdAt: true,
+        },
       }),
       this.prisma.user.count(),
     ]);
@@ -37,8 +51,8 @@ export class UsersService {
   }
 
   async updateRole(id: string, role: Role, actorId: string = 'system') {
-    await this.findById(id); 
-    
+    await this.findById(id);
+
     return this.prisma.$transaction(async (tx) => {
       const updated = await tx.user.update({
         where: { id },
@@ -50,16 +64,26 @@ export class UsersService {
     });
   }
 
-  async toggleActive(id: string, isActive: boolean, actorId: string = 'system') {
-    await this.findById(id); 
-    
+  async toggleActive(
+    id: string,
+    isActive: boolean,
+    actorId: string = 'system',
+  ) {
+    await this.findById(id);
+
     return this.prisma.$transaction(async (tx) => {
       const updated = await tx.user.update({
         where: { id },
         data: { isActive },
         select: { id: true, email: true, name: true, isActive: true },
       });
-      await this.auditService.logAction(tx, actorId, 'TOGGLE_ACTIVE', 'User', id);
+      await this.auditService.logAction(
+        tx,
+        actorId,
+        'TOGGLE_ACTIVE',
+        'User',
+        id,
+      );
       return updated;
     });
   }

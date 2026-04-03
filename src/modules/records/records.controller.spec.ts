@@ -56,7 +56,9 @@ describe('RecordsController', () => {
       await controller.findAll(mockReq, filterDto as any);
 
       expect(mockRecordsService.findAll).toHaveBeenCalledWith(
-        filterDto, 'user-1', 'ADMIN',
+        filterDto,
+        'user-1',
+        'ADMIN',
       );
     });
   });
@@ -67,7 +69,11 @@ describe('RecordsController', () => {
 
       await controller.findOne(mockReq, 'r1');
 
-      expect(mockRecordsService.findOne).toHaveBeenCalledWith('r1', 'user-1', 'ADMIN');
+      expect(mockRecordsService.findOne).toHaveBeenCalledWith(
+        'r1',
+        'user-1',
+        'ADMIN',
+      );
     });
   });
 
@@ -79,7 +85,10 @@ describe('RecordsController', () => {
       await controller.update('r1', dto as any, mockReq);
 
       expect(mockRecordsService.update).toHaveBeenCalledWith(
-        'r1', dto, 'user-1', 'ADMIN',
+        'r1',
+        dto,
+        'user-1',
+        'ADMIN',
       );
     });
   });
@@ -90,7 +99,11 @@ describe('RecordsController', () => {
 
       await controller.remove('r1', mockReq);
 
-      expect(mockRecordsService.remove).toHaveBeenCalledWith('r1', 'user-1', 'ADMIN');
+      expect(mockRecordsService.remove).toHaveBeenCalledWith(
+        'r1',
+        'user-1',
+        'ADMIN',
+      );
     });
   });
 });

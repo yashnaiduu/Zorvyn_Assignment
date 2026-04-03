@@ -23,7 +23,9 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Zorvyn Finance API')
-    .setDescription('Enterprise-grade Finance Data Processing and Access Control API')
+    .setDescription(
+      'Enterprise-grade Finance Data Processing and Access Control API',
+    )
     .setVersion('1.0')
     .addBearerAuth()
     .build();
@@ -37,4 +39,4 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+void bootstrap();
